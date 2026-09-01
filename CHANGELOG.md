@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Comprehensive RFC-based test suite: 72 tests covering aggregation, edge cases,
+  validation, IPv6 normalization, cascade, mixed v4/v6, and alignment
+  (RFC 791, 1519, 3021, 4193, 4291, 4632, 5156, 5735, 5952, 6890)
+- Patricia trie: `trie_insert()` with covered-prefix suppression and subtree pruning
+- Patricia trie: `trie_aggregate()` — bottom-up sibling merge (post-order)
+- Patricia trie: `trie_walk()` — pre-order traversal with numerically sorted output
+- CIDR prefix parser with `inet_pton`, IPv4/IPv6 auto-detection, host-bit masking
+- Full `aggregate_prefixes()` orchestration: parse → insert → aggregate → walk → output
+- IPv4/IPv6 address family filtering via `-4`/`-6` flags
+
 ## [0.1.0] - 2025-09-02
 
 ### Added

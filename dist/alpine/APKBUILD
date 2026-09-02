@@ -1,0 +1,25 @@
+# Maintainer: 0xkee <0xkee@users.noreply.github.com>
+pkgname=aggregate6
+pkgver=0.1.0
+pkgrel=0
+pkgdesc="Fast CIDR prefix aggregation tool"
+url="https://github.com/0xkee/aggregate6"
+arch="all"
+license="GPL-3.0-or-later"
+makedepends="gcc make"
+depends=""
+source="$pkgname-$pkgver.tar.gz::https://github.com/0xkee/aggregate6/archive/v$pkgver.tar.gz"
+
+build() {
+	make CC=gcc CFLAGS="$CFLAGS"
+}
+
+check() {
+	make test
+}
+
+package() {
+	make install PREFIX=/usr DESTDIR="$pkgdir"
+}
+
+sha512sums=""

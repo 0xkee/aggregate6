@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Packaging files (dist/) for 10 distributions: Entware, OpenWrt, Debian/Ubuntu, RPM (Fedora/RHEL/openSUSE), Alpine Linux, Arch Linux, Gentoo, Void Linux, NixOS, FreeBSD
+- Packaging documentation (dist/README.md) with build instructions per distribution
 - Comprehensive RFC-based test suite: 72 tests covering aggregation, edge cases,
   validation, IPv6 normalization, cascade, mixed v4/v6, and alignment
   (RFC 791, 1519, 3021, 4193, 4291, 4632, 5156, 5735, 5952, 6890)

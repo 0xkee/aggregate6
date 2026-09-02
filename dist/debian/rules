@@ -1,0 +1,12 @@
+#!/usr/bin/make -f
+%:
+	dh $@
+
+override_dh_auto_build:
+	$(MAKE) CC=gcc
+
+override_dh_auto_install:
+	$(MAKE) install PREFIX=/usr DESTDIR=debian/aggregate6
+
+override_dh_auto_test:
+	$(MAKE) test

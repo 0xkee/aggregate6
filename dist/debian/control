@@ -1,0 +1,15 @@
+Source: aggregate6
+Section: net
+Priority: optional
+Maintainer: 0xkee <0xkee@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13), gcc, make
+Standards-Version: 4.6.2
+Homepage: https://github.com/0xkee/aggregate6
+
+Package: aggregate6
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Fast CIDR prefix aggregation tool
+ Reads IPv4/IPv6 prefixes from stdin, aggregates them,
+ outputs minimal covering set. Written in C99 with zero
+ external dependencies.

@@ -55,6 +55,25 @@ Installs to `$(PREFIX)/bin/aggregate6`.
 make test
 ```
 
+## Packaging
+
+Pre-made packaging files for 10 distributions are available in the [`dist/`](dist/) directory:
+
+| Distribution | Format |
+|---|---|
+| Entware | opkg Makefile |
+| OpenWrt | opkg Makefile |
+| Debian / Ubuntu | dpkg |
+| Fedora / RHEL / CentOS | RPM spec |
+| Alpine Linux | APKBUILD |
+| Arch Linux | PKGBUILD |
+| Gentoo | ebuild |
+| Void Linux | xbps-src template |
+| NixOS | Nix derivation |
+| FreeBSD | ports Makefile |
+
+See [`dist/README.md`](dist/README.md) for detailed build instructions per distribution.
+
 ## License
 
 GPL-3.0-or-later — see [LICENSE](LICENSE).

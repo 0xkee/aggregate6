@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pkgmetadata SYSTEM "https://www.gentoo.org/dtd/metadata.dtd">
+<pkgmetadata>
+	<maintainer type="person">
+		<email>0xkee@users.noreply.github.com</email>
+		<name>0xkee</name>
+	</maintainer>
+	<longdescription>
+		Reads IPv4/IPv6 prefixes from stdin, aggregates them using a Patricia trie,
+		and outputs the minimal covering set. Written in C99 with zero external dependencies.
+	</longdescription>
+	<upstream>
+		<remote-id type="github">0xkee/aggregate6</remote-id>
+	</upstream>
+</pkgmetadata>

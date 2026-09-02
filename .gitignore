@@ -1,5 +1,5 @@
 # Build
-aggregate6
+/aggregate6
 *.o
 *.d
 

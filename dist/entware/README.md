@@ -21,12 +21,11 @@ automatically scans `net/*/Makefile` to discover packages.
 Add the feed to `feeds.conf` in your Entware build root:
 
 ```bash
-# Remote feed (uses dist/entware/ subdirectory):
-src-git aggregate6 https://github.com/0xkee/aggregate6.git;master
-
-# Or local feed (if you cloned the repo):
 src-link aggregate6 /path/to/aggregate6/dist/entware
 ```
+
+> **Note:** `src-git` won't work because the feed root is `dist/entware/`,
+> not the repository root. Use `src-link` or copy the feed directory (see Manual Build below).
 
 Then update, install, and build:
 

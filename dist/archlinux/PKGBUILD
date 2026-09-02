@@ -7,7 +7,6 @@ arch=('x86_64' 'aarch64')
 url='https://github.com/0xkee/aggregate6'
 license=('GPL-3.0-or-later')
 depends=('glibc')
-makedepends=('gcc' 'make')
 source=("$pkgname-$pkgver.tar.gz::https://github.com/0xkee/aggregate6/releases/download/v$pkgver/aggregate6-$pkgver.tar.gz")
 sha256sums=('1faaa6f4124cb5ec6f252cbddf9df996a5957ad4e8f8beb614098db1fbeb685f')
 

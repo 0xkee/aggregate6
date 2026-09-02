@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Gentoo: root-level symlinks (`metadata`, `profiles`, `app-net` → `dist/gentoo/`) for direct `eselect repository add` support
+
+### Fixed
+
+- Gentoo: stable KEYWORDS (`amd64 arm arm64 x86`) — removed `~` prefix that required manual unmasking
+- Gentoo: removed `sys-devel/gcc` and `sys-devel/make` from BDEPEND (part of @system)
+- Arch Linux: removed `gcc` and `make` from makedepends (part of base-devel)
+- OpenWrt/Entware: removed non-functional `src-git` feed instructions from README (feed root is a subdirectory, `src-link` required)
+
 ## [0.2.0] - 2026-09-03
 
 ### Added

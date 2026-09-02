@@ -9,15 +9,10 @@ SRC_URI="https://github.com/0xkee/aggregate6/releases/download/v${PV}/${P}.tar.g
 
 LICENSE="GPL-3+"
 SLOT="0"
-KEYWORDS="~amd64 ~arm ~arm64 ~x86"
-
-BDEPEND="
-	sys-devel/gcc
-	sys-devel/make
-"
+KEYWORDS="amd64 arm arm64 x86"
 
 src_compile() {
-	emake CC=gcc CFLAGS="${CFLAGS}"
+	emake CFLAGS="${CFLAGS}"
 }
 
 src_test() {

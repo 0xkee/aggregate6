@@ -21,12 +21,11 @@ The `dist/openwrt/` directory is the feed root. OpenWrt SDK automatically scans
 Add the feed to `feeds.conf` or `feeds.conf.default` in your OpenWrt build root:
 
 ```bash
-# Remote feed (uses dist/openwrt/ subdirectory):
-src-git aggregate6 https://github.com/0xkee/aggregate6.git;master
-
-# Or local feed (if you cloned the repo):
 src-link aggregate6 /path/to/aggregate6/dist/openwrt
 ```
+
+> **Note:** `src-git` won't work because the feed root is `dist/openwrt/`,
+> not the repository root. Use `src-link` or copy the feed directory (see Manual Build below).
 
 Then update, install, and build:
 

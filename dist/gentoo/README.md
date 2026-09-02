@@ -19,24 +19,16 @@ dist/gentoo/
 
 ## Installation
 
-### Method 1: eselect repository (quickest)
-
-> **Note:** This pulls the entire `aggregate6` git repository, not just the overlay.
-> Consider Method 3 for a leaner setup.
+### Method 1: eselect repository
 
 ```bash
-eselect repository add aggregate6 git https://github.com/0xkee/aggregate6.git
-# Since the overlay lives in dist/gentoo/, configure sync-subdir:
-cat > /etc/portage/repos.conf/aggregate6.conf <<'EOF'
-[aggregate6]
-location = /var/db/repos/aggregate6
-sync-type = git
-sync-uri = https://github.com/0xkee/aggregate6.git
-auto-sync = yes
-EOF
-# Note: Portage doesn't support subdirectory sync natively.
-# See Method 3 for a workaround using symlinks.
+sudo eselect repository add aggregate6 git https://github.com/0xkee/aggregate6.git
+sudo emaint sync -r aggregate6
+sudo emerge app-net/aggregate6
 ```
+
+The repository root contains symlinks (`metadata`, `profiles`, `app-net`) pointing
+into `dist/gentoo/`, so the overlay works directly without additional configuration.
 
 ### Method 2: Manual repos.conf
 
@@ -50,35 +42,11 @@ sync-uri = https://github.com/0xkee/aggregate6.git
 auto-sync = yes
 ```
 
-> **Sparse checkout note:** Portage's git sync doesn't support subdirectory checkout.
-> The full repo will be cloned. If you want only the overlay files, use Method 3.
-
-### Method 3: Local overlay via symlink (recommended)
+Then sync and install:
 
 ```bash
-# Clone the repository
-git clone --depth=1 https://github.com/0xkee/aggregate6.git /tmp/aggregate6
-
-# Symlink the overlay directory
-ln -s /tmp/aggregate6/dist/gentoo /var/db/repos/aggregate6
-
-# Or copy instead of symlink
-cp -r /tmp/aggregate6/dist/gentoo /var/db/repos/aggregate6
-```
-
-Then create `/etc/portage/repos.conf/aggregate6.conf`:
-
-```ini
-[aggregate6]
-location = /var/db/repos/aggregate6
-auto-sync = false
-```
-
-### Emerge
-
-```bash
-emerge --sync aggregate6   # if using sync method
-emerge app-net/aggregate6
+sudo emaint sync -r aggregate6
+sudo emerge app-net/aggregate6
 ```
 
 ## Version Management

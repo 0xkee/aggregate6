@@ -111,24 +111,42 @@ echo "  Updated: freebsd/Makefile + distinfo"
 
 # --- Gentoo ebuild ---
 # SRC_URI uses Portage variables ${PV}/${P} — no sed for URL needed.
-# Copy latest ebuild to new versioned filename.
+# Copy latest versioned ebuild to new versioned filename.
 EBUILD_DIR="${SCRIPT_DIR}/gentoo/app-net/aggregate6"
 NEW_EBUILD="${EBUILD_DIR}/aggregate6-${VERSION}.ebuild"
 if [ ! -f "${NEW_EBUILD}" ]; then
-    LATEST_EBUILD=$(find "${EBUILD_DIR}" -name 'aggregate6-*.ebuild' 2>/dev/null \
-        | sort -V | tail -1)
+    LATEST_EBUILD=$(find "${EBUILD_DIR}" -name 'aggregate6-[0-9]*.ebuild' \
+        ! -name '*-9999.ebuild' 2>/dev/null | sort -V | tail -1)
     if [ -n "${LATEST_EBUILD}" ]; then
         cp "${LATEST_EBUILD}" "${NEW_EBUILD}"
         echo "  Created: gentoo ebuild aggregate6-${VERSION}.ebuild"
     fi
 fi
-# Rotation: keep only the last MAX_VERSIONS ebuilds
-mapfile -t EBUILDS < <(find "${EBUILD_DIR}" -name 'aggregate6-*.ebuild' 2>/dev/null | sort -V)
+# Rotation: keep only the last MAX_VERSIONS versioned ebuilds (skip 9999 live)
+mapfile -t EBUILDS < <(find "${EBUILD_DIR}" -name 'aggregate6-[0-9]*.ebuild' \
+    ! -name '*-9999.ebuild' 2>/dev/null | sort -V)
 while [ "${#EBUILDS[@]}" -gt "${MAX_VERSIONS}" ]; do
     echo "  Removing old ebuild: $(basename "${EBUILDS[0]}")"
     rm -f "${EBUILDS[0]}"
     EBUILDS=("${EBUILDS[@]:1}")
 done
+
+# --- Gentoo Manifest ---
+# Download archive tarball and compute BLAKE2B + SHA512 for portage Manifest.
+GENTOO_ARCHIVE_URL="https://github.com/0xkee/aggregate6/archive/refs/tags/v${VERSION}.tar.gz"
+MANIFEST="${EBUILD_DIR}/Manifest"
+TMPDIR_MANIFEST=$(mktemp -d)
+MANIFEST_TARBALL="${TMPDIR_MANIFEST}/${TARBALL}"
+if curl -fsSL -o "${MANIFEST_TARBALL}" "${GENTOO_ARCHIVE_URL}"; then
+    MANIFEST_SIZE=$(stat -c%s "${MANIFEST_TARBALL}")
+    MANIFEST_BLAKE2B=$(b2sum "${MANIFEST_TARBALL}" | awk '{print $1}')
+    MANIFEST_SHA512=$(sha512sum "${MANIFEST_TARBALL}" | awk '{print $1}')
+    echo "DIST ${TARBALL} ${MANIFEST_SIZE} BLAKE2B ${MANIFEST_BLAKE2B} SHA512 ${MANIFEST_SHA512}" > "${MANIFEST}"
+    echo "  Generated: gentoo Manifest"
+else
+    echo "  WARNING: Could not download tarball for Manifest generation" >&2
+fi
+rm -rf "${TMPDIR_MANIFEST}"
 
 # --- Debian changelog ---
 # Full history — no rotation. Prepend new entry if not already present.

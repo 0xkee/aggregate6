@@ -10,11 +10,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Gentoo: root-level symlinks (`metadata`, `profiles`, `app-net` → `dist/gentoo/`) for direct `eselect repository add` support
+- Gentoo: live ebuild (`aggregate6-9999.ebuild`) with `git-r3` for development builds
+- Gentoo: Manifest auto-generation in `dist/update-dist.sh` (BLAKE2B + SHA512 from GitHub archive tarball)
 
 ### Fixed
 
+- Gentoo: `SRC_URI` switched from non-existent release tarball to GitHub auto-generated archive (`archive/refs/tags/`)
 - Gentoo: stable KEYWORDS (`amd64 arm arm64 x86`) — removed `~` prefix that required manual unmasking
 - Gentoo: removed `sys-devel/gcc` and `sys-devel/make` from BDEPEND (part of @system)
+- Gentoo: ebuild rotation in `update-dist.sh` now excludes `9999.ebuild` from cleanup
 - Arch Linux: removed `gcc` and `make` from makedepends (part of base-devel)
 - OpenWrt/Entware: removed non-functional `src-git` feed instructions from README (feed root is a subdirectory, `src-link` required)
 

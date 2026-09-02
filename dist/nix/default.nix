@@ -2,11 +2,11 @@
 
 stdenv.mkDerivation rec {
   pname = "aggregate6";
-  version = "0.1.0";
+  version = "0.2.0";
 
   src = fetchurl {
     url = "https://github.com/0xkee/aggregate6/releases/download/v${version}/${pname}-${version}.tar.gz";
-    sha256 = lib.fakeHash;
+    sha256 = "sha256-H6qm9BJMtexvJSy93535lqWVetTo+L62FAmNsfvraF8=";
   };
 
   # Zero external dependencies — only libc

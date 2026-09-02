@@ -1,6 +1,6 @@
 # Template file for 'aggregate6'
 pkgname=aggregate6
-version=0.1.0
+version=0.2.0
 revision=1
 build_style=gnu-makefile
 make_install_args="PREFIX=/usr"
@@ -9,4 +9,4 @@ maintainer="0xkee <0xkee@users.noreply.github.com>"
 license="GPL-3.0-or-later"
 homepage="https://github.com/0xkee/aggregate6"
 distfiles="https://github.com/0xkee/aggregate6/releases/download/v${version}/aggregate6-${version}.tar.gz"
-checksum=PLACEHOLDER_SHA256
+checksum=1faaa6f4124cb5ec6f252cbddf9df996a5957ad4e8f8beb614098db1fbeb685f

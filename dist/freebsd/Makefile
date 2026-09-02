@@ -1,5 +1,5 @@
 PORTNAME=	aggregate6
-DISTVERSION=	0.2.0
+DISTVERSION=	0.2.1
 CATEGORIES=	net
 
 MAINTAINER=	0xkee@users.noreply.github.com

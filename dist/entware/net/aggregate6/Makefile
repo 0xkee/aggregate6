@@ -1,12 +1,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=aggregate6
-PKG_VERSION:=0.2.0
+PKG_VERSION:=0.2.1
 PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://github.com/0xkee/aggregate6/releases/download/v$(PKG_VERSION)
-PKG_HASH:=1faaa6f4124cb5ec6f252cbddf9df996a5957ad4e8f8beb614098db1fbeb685f
+PKG_HASH:=33dcc3027e4a6525ae57c4ec2180794b002b81a71ef03515776ccf6daaa1b4f3
 
 PKG_LICENSE:=GPL-3.0-or-later
 PKG_LICENSE_FILES:=LICENSE

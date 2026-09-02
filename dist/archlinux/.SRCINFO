@@ -1,13 +1,13 @@
 pkgbase = aggregate6
 	pkgdesc = Fast CIDR prefix aggregation tool
-	pkgver = 0.2.0
+	pkgver = 0.2.1
 	pkgrel = 1
 	url = https://github.com/0xkee/aggregate6
 	arch = x86_64
 	arch = aarch64
 	license = GPL-3.0-or-later
 	depends = glibc
-	source = aggregate6-0.2.0.tar.gz::https://github.com/0xkee/aggregate6/releases/download/v0.2.0/aggregate6-0.2.0.tar.gz
-	sha256sums = 1faaa6f4124cb5ec6f252cbddf9df996a5957ad4e8f8beb614098db1fbeb685f
+	source = aggregate6-0.2.1.tar.gz::https://github.com/0xkee/aggregate6/releases/download/v0.2.1/aggregate6-0.2.1.tar.gz
+	sha256sums = 33dcc3027e4a6525ae57c4ec2180794b002b81a71ef03515776ccf6daaa1b4f3
 
 pkgname = aggregate6

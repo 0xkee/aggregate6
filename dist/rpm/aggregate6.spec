@@ -1,5 +1,5 @@
 Name:           aggregate6
-Version:        0.2.0
+Version:        0.2.1
 Release:        1%{?dist}
 Summary:        Fast CIDR prefix aggregation tool
 
@@ -32,6 +32,8 @@ make test
 %{_bindir}/aggregate6
 
 %changelog
+* Wed Sep 02 2026 0xkee <0xkee@users.noreply.github.com> - 0.2.1-1
+- Update to 0.2.1
 * Wed Sep 02 2026 0xkee <0xkee@users.noreply.github.com> - 0.2.0-1
 - Update to 0.2.0
 * Tue Sep 02 2025 0xkee <0xkee@users.noreply.github.com> - 0.1.0-1

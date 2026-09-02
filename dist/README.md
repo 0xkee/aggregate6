@@ -1,105 +1,115 @@
-# Packaging aggregate6
+# Distribution Packages
 
-This directory contains packaging files for building `aggregate6` on various Linux distributions and operating systems.
+Pre-made packaging for **10 platforms**. Each `dist/<distro>/` directory is a
+self-contained repository, overlay, or feed that can be used directly by the
+target distro's package manager.
 
-## Supported Distributions
+All packages fetch source tarballs from
+[GitHub Releases](https://github.com/0xkee/aggregate6/releases) — no `git clone`
+at build time.
 
-| Distribution | Directory | Format |
-|---|---|---|
-| Entware (OpenWrt-based routers) | `entware/` | opkg Makefile |
-| OpenWrt | `openwrt/` | opkg Makefile |
-| Debian / Ubuntu | `debian/` | dpkg (control, rules, etc.) |
-| Fedora / RHEL / CentOS / openSUSE | `rpm/` | RPM spec |
-| Alpine Linux | `alpine/` | APKBUILD |
-| Arch Linux | `archlinux/` | PKGBUILD |
-| Gentoo | `gentoo/` | ebuild |
-| Void Linux | `void/` | xbps-src template |
-| NixOS | `nix/` | Nix derivation |
-| FreeBSD | `freebsd/` | ports Makefile |
+## Supported Platforms
 
-## Build Instructions
+| Distribution | Type | Directory | Package Format | Quick Install |
+|---|---|---|---|---|
+| Gentoo | Overlay | [`gentoo/`](gentoo/) | ebuild | `emerge app-net/aggregate6` |
+| Alpine Linux | aports | [`alpine/`](alpine/) | APKBUILD | `abuild -r` |
+| Arch Linux | AUR | [`archlinux/`](archlinux/) | PKGBUILD | `yay -S aggregate6` |
+| Void Linux | void-packages | [`void/`](void/) | xbps-src template | `./xbps-src pkg aggregate6` |
+| Fedora / RHEL | COPR | [`rpm/`](rpm/) | RPM spec | `dnf copr enable 0xkee/aggregate6 && dnf install aggregate6` |
+| NixOS | Flake | [`nix/`](nix/) | Nix derivation | `nix profile install github:0xkee/aggregate6?dir=dist/nix` |
+| Debian / Ubuntu | dpkg | [`debian/`](debian/) | deb | `dpkg-buildpackage -us -uc` |
+| OpenWrt | Feed | [`openwrt/`](openwrt/) | opkg Makefile | `make package/aggregate6/compile V=s` |
+| Entware | Feed | [`entware/`](entware/) | opkg Makefile | `make package/aggregate6/compile V=s` |
+| FreeBSD | Port | [`freebsd/`](freebsd/) | ports Makefile | `cd /usr/ports/net/aggregate6 && make install clean` |
 
-### Entware
+## Directory Structure
 
-```bash
-# Add to your Entware packages feed, then:
-make package/aggregate6/compile V=s
+```
+dist/
+├── update-dist.sh                          # Version/checksum updater
+├── README.md                               # This file
+├── gentoo/                                 # Gentoo Overlay
+│   ├── metadata/layout.conf
+│   ├── profiles/{repo_name,categories}
+│   ├── app-net/aggregate6/*.ebuild
+│   └── README.md
+├── alpine/                                 # Alpine aports
+│   ├── testing/aggregate6/APKBUILD
+│   └── README.md
+├── archlinux/                              # Arch Linux AUR
+│   ├── PKGBUILD, .SRCINFO
+│   └── README.md
+├── void/                                   # Void Linux
+│   ├── srcpkgs/aggregate6/template
+│   └── README.md
+├── rpm/                                    # RPM / COPR
+│   ├── aggregate6.spec, aggregate6.repo
+│   └── README.md
+├── nix/                                    # NixOS Flake
+│   ├── default.nix, flake.nix
+│   └── README.md
+├── debian/                                 # Debian / Ubuntu
+│   ├── control, rules, changelog, ...
+│   └── README.md
+├── openwrt/                                # OpenWrt Feed
+│   ├── net/aggregate6/Makefile
+│   └── README.md
+├── entware/                                # Entware Feed
+│   ├── net/aggregate6/Makefile
+│   └── README.md
+└── freebsd/                                # FreeBSD Port
+    ├── Makefile, distinfo, pkg-descr
+    └── README.md
 ```
 
-### OpenWrt
+## Release Automation
+
+### GitHub Actions (`release.yml`)
+
+Pushing a tag `v*` triggers the
+[release workflow](../.github/workflows/release.yml):
+
+1. Checkout, build, and run tests
+2. Create a source tarball via `git archive`
+3. Calculate SHA-256/SHA-512 checksums
+4. Run `dist/update-dist.sh` to update **all** packaging files
+5. Commit changes to `master` and push
+6. Create a GitHub Release with the tarball and checksum files
+
+### `update-dist.sh`
 
 ```bash
-# Copy dist/openwrt/ to package/aggregate6/ in OpenWrt SDK
-# Then:
-make package/aggregate6/compile V=s
+dist/update-dist.sh VERSION SHA256 SHA512 SIZE
 ```
 
-### Debian / Ubuntu
+Updates version numbers, source URLs, and checksums across all 10 packaging
+formats in a single pass. Called automatically by the release workflow — can
+also be run manually.
 
-```bash
-# From project root:
-cp -r dist/debian .
-dpkg-buildpackage -us -uc -b
-# .deb will be in parent directory
-```
+Files updated:
+- `alpine/testing/aggregate6/APKBUILD` — `pkgver`, `source`, `sha512sums`
+- `archlinux/PKGBUILD` + `.SRCINFO` — `pkgver`, `sha256sums`
+- `rpm/aggregate6.spec` — `Version`, `%changelog`
+- `void/srcpkgs/aggregate6/template` — `version`, `checksum`
+- `nix/default.nix` — `version`, `sha256` (SRI format)
+- `openwrt/net/aggregate6/Makefile` — `PKG_VERSION`, `PKG_HASH`
+- `entware/net/aggregate6/Makefile` — `PKG_VERSION`, `PKG_HASH`
+- `freebsd/Makefile` + `distinfo` — `DISTVERSION`, checksums
+- `gentoo/app-net/aggregate6/*.ebuild` — new versioned ebuild (rotated)
+- `debian/changelog` — new changelog entry prepended
 
-### Fedora / RHEL / RPM-based
+## Per-Distribution Documentation
 
-```bash
-# Create source tarball first:
-tar czf aggregate6-0.1.0.tar.gz --transform='s,^,aggregate6-0.1.0/,' src/ Makefile LICENSE README.md
-rpmbuild -bb dist/rpm/aggregate6.spec --define "_sourcedir $(pwd)"
-```
+Each directory contains its own `README.md` with detailed instructions:
 
-### Alpine Linux
-
-```bash
-# Copy dist/alpine/ to an aports tree, then:
-cd aports/testing/aggregate6
-abuild -r
-```
-
-### Arch Linux
-
-```bash
-cd dist/archlinux
-makepkg -si
-```
-
-### Gentoo
-
-```bash
-# Copy dist/gentoo/app-net/aggregate6/ to local overlay
-# Then:
-emerge app-net/aggregate6
-```
-
-### Void Linux
-
-```bash
-# Copy dist/void/template to void-packages/srcpkgs/aggregate6/template
-cd void-packages
-./xbps-src pkg aggregate6
-```
-
-### NixOS
-
-```bash
-nix-build dist/nix/default.nix
-# Or add to your flake/overlay
-```
-
-### FreeBSD
-
-```bash
-# Copy dist/freebsd/ to /usr/ports/net/aggregate6/
-cd /usr/ports/net/aggregate6
-make install clean
-```
-
-## Notes
-
-- All packaging files reference version `0.1.0`. Update version numbers when releasing new versions.
-- Source URLs use `https://github.com/0xkee/aggregate6` — update if the repository location changes.
-- Checksums (sha256sums, sha512sums) are placeholders — generate actual checksums after creating release tarballs.
-- The project has **zero external dependencies** — only a C99 compiler, make, and libc are required.
+- [Gentoo](gentoo/README.md) — overlay setup, eselect/repos.conf/symlink methods
+- [Alpine](alpine/README.md) — APKBUILD, abuild, aports integration
+- [Arch Linux](archlinux/README.md) — AUR publishing, makepkg, .SRCINFO
+- [Void Linux](void/README.md) — void-packages setup, xbps-src
+- [Fedora / RHEL](rpm/README.md) — COPR setup, rpmbuild, mock
+- [NixOS](nix/README.md) — flake, overlay, nix-build
+- [Debian / Ubuntu](debian/README.md) — dpkg-buildpackage, PPA, reprepro
+- [OpenWrt](openwrt/README.md) — feed setup, SDK build
+- [Entware](entware/README.md) — feed setup, embedded routers
+- [FreeBSD](freebsd/README.md) — ports tree, poudriere

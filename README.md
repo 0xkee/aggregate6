@@ -55,24 +55,27 @@ Installs to `$(PREFIX)/bin/aggregate6`.
 make test
 ```
 
-## Packaging
+## Installation — Distribution Packages
 
-Pre-made packaging files for 10 distributions are available in the [`dist/`](dist/) directory:
+Pre-made packaging for **10 platforms** is available in [`dist/`](dist/).
+Each directory is a self-contained overlay, feed, or port — ready to use
+with your distro's package manager.
 
-| Distribution | Format |
-|---|---|
-| Entware | opkg Makefile |
-| OpenWrt | opkg Makefile |
-| Debian / Ubuntu | dpkg |
-| Fedora / RHEL / CentOS | RPM spec |
-| Alpine Linux | APKBUILD |
-| Arch Linux | PKGBUILD |
-| Gentoo | ebuild |
-| Void Linux | xbps-src template |
-| NixOS | Nix derivation |
-| FreeBSD | ports Makefile |
+| Distribution | Quick Install | Details |
+|---|---|---|
+| Arch Linux | `yay -S aggregate6` | [dist/archlinux/](dist/archlinux/README.md) |
+| Fedora / RHEL | `dnf copr enable 0xkee/aggregate6 && dnf install aggregate6` | [dist/rpm/](dist/rpm/README.md) |
+| NixOS | `nix profile install github:0xkee/aggregate6?dir=dist/nix` | [dist/nix/](dist/nix/README.md) |
+| Gentoo | `emerge app-net/aggregate6` | [dist/gentoo/](dist/gentoo/README.md) |
+| Alpine Linux | `abuild -r` | [dist/alpine/](dist/alpine/README.md) |
+| Void Linux | `./xbps-src pkg aggregate6` | [dist/void/](dist/void/README.md) |
+| Debian / Ubuntu | `dpkg-buildpackage -us -uc` | [dist/debian/](dist/debian/README.md) |
+| FreeBSD | `cd /usr/ports/net/aggregate6 && make install clean` | [dist/freebsd/](dist/freebsd/README.md) |
+| OpenWrt | `make package/aggregate6/compile V=s` | [dist/openwrt/](dist/openwrt/README.md) |
+| Entware | `make package/aggregate6/compile V=s` | [dist/entware/](dist/entware/README.md) |
 
-See [`dist/README.md`](dist/README.md) for detailed build instructions per distribution.
+See [`dist/README.md`](dist/README.md) for full documentation, release automation details,
+and directory structure.
 
 ## License
 

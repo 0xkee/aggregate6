@@ -12,3 +12,6 @@
 # OS
 .DS_Store
 Thumbs.db
+
+# Private (symlinks to aggregate6-private)
+plans

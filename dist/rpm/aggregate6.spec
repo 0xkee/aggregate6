@@ -5,7 +5,7 @@ Summary:        Fast CIDR prefix aggregation tool
 
 License:        GPL-3.0-or-later
 URL:            https://github.com/0xkee/aggregate6
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/0xkee/aggregate6/releases/download/v%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:  gcc
 BuildRequires:  make

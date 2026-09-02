@@ -8,5 +8,5 @@ short_desc="Fast CIDR prefix aggregation tool"
 maintainer="0xkee <0xkee@users.noreply.github.com>"
 license="GPL-3.0-or-later"
 homepage="https://github.com/0xkee/aggregate6"
-distfiles="https://github.com/0xkee/aggregate6/archive/v${version}.tar.gz"
-checksum=SKIP
+distfiles="https://github.com/0xkee/aggregate6/releases/download/v${version}/aggregate6-${version}.tar.gz"
+checksum=PLACEHOLDER_SHA256

@@ -5,6 +5,8 @@ Maintainer: 0xkee <0xkee@users.noreply.github.com>
 Build-Depends: debhelper-compat (= 13), gcc, make
 Standards-Version: 4.6.2
 Homepage: https://github.com/0xkee/aggregate6
+Vcs-Git: https://github.com/0xkee/aggregate6.git -b master [dist/debian]
+Vcs-Browser: https://github.com/0xkee/aggregate6/tree/master/dist/debian
 
 Package: aggregate6
 Architecture: any

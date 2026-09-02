@@ -1,14 +1,12 @@
-{ lib, stdenv, fetchFromGitHub }:
+{ lib, stdenv, fetchurl }:
 
 stdenv.mkDerivation rec {
   pname = "aggregate6";
   version = "0.1.0";
 
-  src = fetchFromGitHub {
-    owner = "0xkee";
-    repo = "aggregate6";
-    rev = "v${version}";
-    sha256 = lib.fakeSha256;
+  src = fetchurl {
+    url = "https://github.com/0xkee/aggregate6/releases/download/v${version}/${pname}-${version}.tar.gz";
+    sha256 = lib.fakeHash;
   };
 
   # Zero external dependencies — only libc

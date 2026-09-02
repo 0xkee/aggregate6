@@ -1,0 +1,9 @@
+[aggregate6]
+name=aggregate6 - CIDR prefix aggregation tool
+baseurl=https://download.copr.fedorainfracloud.org/results/0xkee/aggregate6/fedora-$releasever-$basearch/
+type=rpm-md
+skip_if_unavailable=True
+gpgcheck=1
+gpgkey=https://download.copr.fedorainfracloud.org/results/0xkee/aggregate6/pubkey.gpg
+repo_gpgcheck=0
+enabled=1

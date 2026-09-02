@@ -9,8 +9,8 @@ WWW=		https://github.com/0xkee/aggregate6
 LICENSE=	GPLv3+
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
-USE_GITHUB=	yes
-GH_ACCOUNT=	0xkee
+MASTER_SITES=	https://github.com/0xkee/aggregate6/releases/download/v${DISTVERSION}/
+DISTFILES=	aggregate6-${DISTVERSION}${EXTRACT_SUFX}
 
 USES=		gmake
 ALL_TARGET=	all

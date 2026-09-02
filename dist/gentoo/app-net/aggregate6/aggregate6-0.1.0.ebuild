@@ -5,7 +5,7 @@ EAPI=8
 
 DESCRIPTION="Fast CIDR prefix aggregation tool"
 HOMEPAGE="https://github.com/0xkee/aggregate6"
-SRC_URI="https://github.com/0xkee/aggregate6/archive/v${PV}.tar.gz -> ${P}.tar.gz"
+SRC_URI="https://github.com/0xkee/aggregate6/releases/download/v${PV}/${P}.tar.gz"
 
 LICENSE="GPL-3+"
 SLOT="0"

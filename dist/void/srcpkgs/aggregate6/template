@@ -9,4 +9,4 @@ maintainer="0xkee <0xkee@users.noreply.github.com>"
 license="GPL-3.0-only"
 homepage="https://github.com/0xkee/aggregate6"
 distfiles="https://github.com/0xkee/aggregate6/releases/download/v${version}/aggregate6-${version}.tar.gz"
-checksum=8173163f388ccd2ab01c9b64b8f57e841562417ad0bb9f703612eed5fcc9cb60
+checksum=c6b3b172891a734ba7d4236c00938c7f08ae0e65488085cce233cbfdc416af34

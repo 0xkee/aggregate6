@@ -1,6 +1,6 @@
 # aggregate6 — OpenWrt Feed
 
-OpenWrt package feed for [aggregate6](https://github.com/0xkee/aggregate6) — fast CIDR prefix aggregation tool.
+OpenWrt package feed for [aggregate6](https://github.com/0xkee/aggregate6) — fast multi-threaded IPv4/IPv6 CIDR prefix aggregation tool.
 
 ## Feed Structure
 
@@ -50,7 +50,7 @@ make package/aggregate6/compile V=s
 - **Section:** Network
 - **Install path:** `/usr/bin/aggregate6`
 - **Dependencies:** none (C99, zero external deps)
-- **License:** GPL-3.0-or-later
+- **License:** GPL-3.0-only
 
 ## Version Updates
 

@@ -1,0 +1,119 @@
+name: Entware Package
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  ipk:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - arch: mipsel
+            cc: mipsel-linux-gnu-gcc
+            strip: mipsel-linux-gnu-strip
+            pkg: gcc-mipsel-linux-gnu
+            entware_arch: mipsel-3x
+          - arch: aarch64
+            cc: aarch64-linux-gnu-gcc
+            strip: aarch64-linux-gnu-strip
+            pkg: gcc-aarch64-linux-gnu
+            entware_arch: aarch64-3x
+          - arch: armv7
+            cc: arm-linux-gnueabihf-gcc
+            strip: arm-linux-gnueabihf-strip
+            pkg: gcc-arm-linux-gnueabihf
+            entware_arch: armv7-3x
+          - arch: x86_64
+            cc: gcc
+            strip: strip
+            pkg: ""
+            entware_arch: x86-64-3x
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install cross-compiler
+        if: matrix.pkg != ''
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ${{ matrix.pkg }}
+
+      - name: Download source tarball
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          VERSION="${VERSION#v}"
+          gh release download "${{ github.event.release.tag_name }}" \
+            --repo "${{ github.repository }}" \
+            --pattern "aggregate6-${VERSION}.tar.gz"
+          tar xzf "aggregate6-${VERSION}.tar.gz"
+
+      - name: Cross-compile (static)
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          VERSION="${VERSION#v}"
+          cd "aggregate6-${VERSION}"
+          make CC="${{ matrix.cc }}" \
+            CFLAGS="-Wall -Wextra -Werror -O2 -std=c99" \
+            LDFLAGS="-static" \
+            LDLIBS="-lpthread"
+          ${{ matrix.strip }} aggregate6
+          file aggregate6
+
+      - name: Create .ipk
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          VERSION="${VERSION#v}"
+          SRCDIR="aggregate6-${VERSION}"
+          WORK=$(mktemp -d)
+
+          # data.tar.gz — binary at /opt/bin/
+          mkdir -p "${WORK}/data/opt/bin"
+          cp "${SRCDIR}/aggregate6" "${WORK}/data/opt/bin/"
+          tar czf "${WORK}/data.tar.gz" \
+            --numeric-owner --owner=0 --group=0 \
+            -C "${WORK}/data" .
+
+          # control.tar.gz — package metadata
+          mkdir -p "${WORK}/control"
+          printf '%s\n' \
+            "Package: aggregate6" \
+            "Version: ${VERSION}-1" \
+            "Architecture: ${{ matrix.entware_arch }}" \
+            "Maintainer: 0xkee <0xkee@users.noreply.github.com>" \
+            "Section: net" \
+            "Priority: optional" \
+            "Description: Fast multi-threaded IPv4/IPv6 CIDR prefix aggregation tool" \
+            "Source: https://github.com/0xkee/aggregate6" \
+            "License: GPL-3.0-only" \
+            > "${WORK}/control/control"
+          tar czf "${WORK}/control.tar.gz" \
+            --numeric-owner --owner=0 --group=0 \
+            -C "${WORK}/control" .
+
+          # debian-binary
+          echo "2.0" > "${WORK}/debian-binary"
+
+          # Assemble .ipk (ar archive, order matters)
+          IPK="aggregate6_${VERSION}-1_${{ matrix.entware_arch }}.ipk"
+          cd "${WORK}"
+          ar r "${GITHUB_WORKSPACE}/${IPK}" \
+            debian-binary control.tar.gz data.tar.gz
+
+          echo "Created: ${IPK}"
+          ls -lh "${GITHUB_WORKSPACE}/${IPK}"
+
+      - name: Upload .ipk to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "${{ github.event.release.tag_name }}" \
+            aggregate6_*.ipk \
+            --clobber

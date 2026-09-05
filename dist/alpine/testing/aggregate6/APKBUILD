@@ -2,10 +2,10 @@
 pkgname=aggregate6
 pkgver=0.2.1
 pkgrel=0
-pkgdesc="Fast CIDR prefix aggregation tool"
+pkgdesc="Fast multi-threaded IPv4/IPv6 CIDR prefix aggregation tool"
 url="https://github.com/0xkee/aggregate6"
 arch="all"
-license="GPL-3.0-or-later"
+license="GPL-3.0-only"
 makedepends="gcc make"
 depends=""
 source="$pkgname-$pkgver.tar.gz::https://github.com/0xkee/aggregate6/releases/download/v0.2.1/aggregate6-0.2.1.tar.gz"
@@ -23,5 +23,5 @@ package() {
 }
 
 sha512sums="
-948ad6ba54dbd6fece95eef2ba257cc3d8969985dfebb4f2e24ec8007740a07bba4504fc4e7861b064138bd744c3cdab4c0caf116f9b39d9d8793728f5876fb0  aggregate6-0.2.1.tar.gz
+aa4d6bea5716b72fb5037e131fa5f3bd152b10fa258ecce586157a19b8cf3390e495c68f5de1db07a56009d2e8297609325876038eeb0001ffe551b100d2427e  aggregate6-0.2.1.tar.gz
 "

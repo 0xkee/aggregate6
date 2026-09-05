@@ -31,7 +31,7 @@ sudo dnf install aggregate6
 sudo dnf install rpm-build gcc make
 
 # Download source tarball
-VERSION=0.1.0
+VERSION=0.3.0
 spectool -g -R dist/rpm/aggregate6.spec
 
 # Build RPM

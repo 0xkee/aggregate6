@@ -6,7 +6,7 @@ stdenv.mkDerivation rec {
 
   src = fetchurl {
     url = "https://github.com/0xkee/aggregate6/releases/download/v${version}/${pname}-${version}.tar.gz";
-    sha256 = "sha256-M9zDAn5KZSWuV8TsIYB5SwArgace8DUVd2zPbaqhtPM=";
+    sha256 = "sha256-ft1cDeJiwh9VpxDOoXtqL+CkPDVYE6HSC7l671Q2ca8=";
   };
 
   # Zero external dependencies — only libc
@@ -21,14 +21,14 @@ stdenv.mkDerivation rec {
   checkTarget = "test";
 
   meta = with lib; {
-    description = "Fast CIDR prefix aggregation tool";
+    description = "Fast multi-threaded IPv4/IPv6 CIDR prefix aggregation tool";
     longDescription = ''
-      Reads IPv4/IPv6 prefixes from stdin, aggregates them using a Patricia trie,
-      and outputs the minimal covering set. Written in C99 with zero external
-      dependencies.
+      Reads bulk IPv4/IPv6 prefix lists from stdin or files, aggregates them
+      using a multi-threaded Patricia trie, and outputs the minimal covering
+      set. Written in C99 with zero external dependencies.
     '';
     homepage = "https://github.com/0xkee/aggregate6";
-    license = licenses.gpl3Plus;
+    license = licenses.gpl3Only;
     maintainers = [ ];
     platforms = platforms.unix;
     mainProgram = "aggregate6";

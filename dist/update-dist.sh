@@ -46,13 +46,13 @@ sed -i "s/^sha256sums=.*/sha256sums=('${SHA256}')/" "$PKGBUILD"
 # Regenerate .SRCINFO without makepkg (format is simple key-value text)
 cat > "${SCRIPT_DIR}/archlinux/.SRCINFO" <<EOF
 pkgbase = aggregate6
-	pkgdesc = Fast CIDR prefix aggregation tool
+	pkgdesc = Fast multi-threaded IPv4/IPv6 CIDR prefix aggregation tool
 	pkgver = ${VERSION}
 	pkgrel = 1
 	url = https://github.com/0xkee/aggregate6
 	arch = x86_64
 	arch = aarch64
-	license = GPL-3.0-or-later
+	license = GPL-3.0-only
 	depends = glibc
 	source = aggregate6-${VERSION}.tar.gz::https://github.com/0xkee/aggregate6/releases/download/v${VERSION}/aggregate6-${VERSION}.tar.gz
 	sha256sums = ${SHA256}

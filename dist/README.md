@@ -18,9 +18,9 @@ at build time.
 | Void Linux | void-packages | [`void/`](void/) | xbps-src template | `./xbps-src pkg aggregate6` |
 | Fedora / RHEL | COPR | [`rpm/`](rpm/) | RPM spec | `dnf copr enable 0xkee/aggregate6 && dnf install aggregate6` |
 | NixOS | Flake | [`nix/`](nix/) | Nix derivation | `nix profile install github:0xkee/aggregate6?dir=dist/nix` |
-| Debian / Ubuntu | dpkg | [`debian/`](debian/) | deb | `dpkg-buildpackage -us -uc` |
+| Debian / Ubuntu | dpkg | [`debian/`](debian/) | deb | `dpkg -i aggregate6_VERSION-1_amd64.deb` |
 | OpenWrt | Feed | [`openwrt/`](openwrt/) | opkg Makefile | `make package/aggregate6/compile V=s` |
-| Entware | Feed | [`entware/`](entware/) | opkg Makefile | `make package/aggregate6/compile V=s` |
+| Entware | Feed | [`entware/`](entware/) | opkg Makefile | `opkg install aggregate6_VERSION-1_ARCH.ipk` |
 | FreeBSD | Port | [`freebsd/`](freebsd/) | ports Makefile | `cd /usr/ports/net/aggregate6 && make install clean` |
 
 ## Directory Structure
@@ -76,6 +76,19 @@ Pushing a tag `v*` triggers the
 4. Run `dist/update-dist.sh` to update **all** packaging files
 5. Commit changes to `master` and push
 6. Create a GitHub Release with the tarball and checksum files
+
+### Binary Package Workflows
+
+When a GitHub Release is published, two additional workflows build and upload
+pre-built binary packages to the same release:
+
+| Workflow | Packages | Architectures |
+|---|---|---|
+| [`deb-release.yml`](../.github/workflows/deb-release.yml) | `.deb` (Debian/Ubuntu) | amd64 |
+| [`entware-release.yml`](../.github/workflows/entware-release.yml) | `.ipk` (Entware) | mipsel, aarch64, armv7, x86_64 |
+
+Entware `.ipk` packages are statically linked — zero runtime dependencies,
+compatible with any Entware version.
 
 ### `update-dist.sh`
 

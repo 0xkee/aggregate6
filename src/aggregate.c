@@ -1,166 +1,189 @@
 /*
- * aggregate6 — fast CIDR prefix aggregation tool
- * Copyright (c) 2025 0xkee
- * SPDX-License-Identifier: GPL-3.0-or-later
+ * aggregate6 — fast multi-threaded IPv4/IPv6 CIDR prefix aggregation tool
+ * Copyright (c) 2026 0xkee
+ * SPDX-License-Identifier: GPL-3.0-only
  */
 
 #define _POSIX_C_SOURCE 200809L
 
 #include "aggregate.h"
-#include "trie.h"
+#include "prefix.h"
 
-#include <arpa/inet.h>
+#include <fcntl.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
-#define MAX_PFXLEN_V4  32
-#define MAX_PFXLEN_V6  128
-#define ADDR_BUF_SIZE  64
+#define MAX_LINE   256
+#define OUT_BUF_SZ 64
+#define AVG_LINE   18  /* avg bytes per CIDR line */
 
-/**
- * Zero out host bits beyond prefixlen in addr.
- *
- * @param addr      Address bytes (modified in-place).
- * @param addr_len  Total byte length (4 or 16).
- * @param prefixlen Prefix length in bits.
- */
-static void mask_host_bits(uint8_t *addr, int addr_len,
-                           int prefixlen)
+struct agg_ctx {
+    struct prefix_arrays pa;
+    int flags;
+};
+
+/** Thread argument for parallel aggregation. */
+struct agg_thread_arg {
+    struct prefix4 *arr;
+    size_t count;
+};
+
+static void *agg_v4_thread(void *arg)
 {
-    int byte_idx = prefixlen / 8;
-    int bit_off  = prefixlen % 8;
+    struct agg_thread_arg *ta = arg;
 
-    if (bit_off > 0) {
-        addr[byte_idx] &=
-            (uint8_t)~((1 << (8 - bit_off)) - 1);
-        byte_idx++;
+    prefix4_aggregate(ta->arr, &ta->count);
+    return NULL;
+}
+
+struct agg_ctx *agg_create(int flags)
+{
+    struct agg_ctx *ctx;
+
+    ctx = calloc(1, sizeof(*ctx));
+    if (!ctx)
+        return NULL;
+    ctx->flags = flags;
+    if (pa_init(&ctx->pa) < 0) {
+        free(ctx);
+        return NULL;
     }
-    if (byte_idx < addr_len)
-        memset(addr + byte_idx, 0, (size_t)(addr_len - byte_idx));
+    return ctx;
+}
+
+int agg_add_stream(struct agg_ctx *ctx, FILE *input)
+{
+    char line[MAX_LINE];
+    int skip_v4, skip_v6;
+
+    skip_v4 = (ctx->flags & AGG_IPV6_ONLY) != 0;
+    skip_v6 = (ctx->flags & AGG_IPV4_ONLY) != 0;
+
+    while (fgets(line, sizeof(line), input)) {
+        size_t len = strlen(line);
+
+        while (len > 0 &&
+               (line[len - 1] == '\n' ||
+                line[len - 1] == '\r'))
+            line[--len] = '\0';
+
+        if (len == 0 || line[0] == '#')
+            continue;
+
+        if (pa_add_line(&ctx->pa, line,
+                        skip_v4, skip_v6) < 0)
+            return -1;
+    }
+    return 0;
 }
 
 /**
- * Parse a single CIDR prefix string and insert into the
- * appropriate trie.
- *
- * @return 0 on success (or skip), -1 only on fatal error.
+ * Read file via mmap for zero-copy parsing.
+ * Falls back to fopen+fgets if mmap fails.
  */
-static int parse_and_insert(const char *str, struct trie *t4,
-                            struct trie *t6, int flags)
+int agg_add_file(struct agg_ctx *ctx, const char *path)
 {
-    char buf[ADDR_BUF_SIZE];
-    const char *slash;
-    int af, maxbits, prefixlen, addr_len;
-    uint8_t addr[16];
-    struct trie *t;
+    int fd;
+    struct stat st;
+    char *data;
+    size_t est;
+    int skip_v4, skip_v6;
+    int ret;
 
-    slash = strchr(str, '/');
-    if (slash) {
-        size_t host_len = (size_t)(slash - str);
-        if (host_len >= sizeof(buf)) {
-            fprintf(stderr, "warning: prefix too long: %s\n",
-                    str);
-            return 0;
-        }
-        memcpy(buf, str, host_len);
-        buf[host_len] = '\0';
-        prefixlen = atoi(slash + 1);
-    } else {
-        if (strlen(str) >= sizeof(buf)) {
-            fprintf(stderr, "warning: prefix too long: %s\n",
-                    str);
-            return 0;
-        }
-        strcpy(buf, str);
-        prefixlen = -1; /* determined below */
-    }
-
-    af = strchr(buf, ':') ? AF_INET6 : AF_INET;
-
-    if (af == AF_INET6) {
-        maxbits  = MAX_PFXLEN_V6;
-        addr_len = 16;
-        t = t6;
-        if (prefixlen < 0)
-            prefixlen = MAX_PFXLEN_V6;
-    } else {
-        maxbits  = MAX_PFXLEN_V4;
-        addr_len = 4;
-        t = t4;
-        if (prefixlen < 0)
-            prefixlen = MAX_PFXLEN_V4;
-    }
-
-    /* apply address family filter */
-    if ((flags & AGG_IPV4_ONLY) && af == AF_INET6)
-        return 0;
-    if ((flags & AGG_IPV6_ONLY) && af == AF_INET)
-        return 0;
-
-    if (prefixlen < 0 || prefixlen > maxbits) {
-        fprintf(stderr, "warning: bad prefix length: %s\n",
-                str);
-        return 0;
-    }
-
-    if (inet_pton(af, buf, addr) != 1) {
-        fprintf(stderr, "warning: bad address: %s\n", str);
-        return 0;
-    }
-
-    mask_host_bits(addr, addr_len, prefixlen);
-
-    return trie_insert(t, addr, prefixlen, maxbits);
-}
-
-/**
- * trie_walk callback — print a single aggregated prefix.
- */
-static void print_prefix(const uint8_t *addr, int prefixlen,
-                         int maxbits, void *ctx)
-{
-    char buf[INET6_ADDRSTRLEN];
-    int af;
-
-    (void)ctx;
-
-    af = (maxbits == MAX_PFXLEN_V4) ? AF_INET : AF_INET6;
-    inet_ntop(af, addr, buf, sizeof(buf));
-    printf("%s/%d\n", buf, prefixlen);
-}
-
-int aggregate_prefixes(const char **prefixes, size_t count,
-                       int flags)
-{
-    struct trie *t4;
-    struct trie *t6;
-    size_t i;
-
-    t4 = trie_create();
-    t6 = trie_create();
-    if (!t4 || !t6) {
-        trie_destroy(t4);
-        trie_destroy(t6);
+    fd = open(path, O_RDONLY);
+    if (fd < 0) {
+        fprintf(stderr, "%s: ", path);
+        perror(NULL);
         return -1;
     }
 
-    for (i = 0; i < count; i++) {
-        if (parse_and_insert(prefixes[i], t4, t6, flags) < 0) {
-            trie_destroy(t4);
-            trie_destroy(t6);
-            return -1;
-        }
+    if (fstat(fd, &st) < 0 || st.st_size == 0) {
+        close(fd);
+        if (st.st_size == 0)
+            return 0;
+        /* fallback for special files */
+        goto fallback;
     }
 
-    trie_aggregate(t4);
-    trie_aggregate(t6);
+    data = mmap(NULL, (size_t)st.st_size,
+                PROT_READ | PROT_WRITE,
+                MAP_PRIVATE, fd, 0);
+    close(fd);
 
-    trie_walk(t4, print_prefix, MAX_PFXLEN_V4, NULL);
-    trie_walk(t6, print_prefix, MAX_PFXLEN_V6, NULL);
+    if (data == MAP_FAILED)
+        goto fallback;
 
-    trie_destroy(t4);
-    trie_destroy(t6);
+    /* pre-allocate arrays based on file size */
+    est = (size_t)st.st_size / AVG_LINE;
+    pa_reserve(&ctx->pa, est, est / 4);
 
+    skip_v4 = (ctx->flags & AGG_IPV6_ONLY) != 0;
+    skip_v6 = (ctx->flags & AGG_IPV4_ONLY) != 0;
+
+    ret = pa_add_buf(&ctx->pa, data, (size_t)st.st_size,
+                     skip_v4, skip_v6);
+
+    munmap(data, (size_t)st.st_size);
+    return ret;
+
+fallback:;
+    FILE *fp = fopen(path, "r");
+    if (!fp) {
+        fprintf(stderr, "%s: ", path);
+        perror(NULL);
+        return -1;
+    }
+    ret = agg_add_stream(ctx, fp);
+    fclose(fp);
+    return ret;
+}
+
+int agg_finish(struct agg_ctx *ctx)
+{
+    struct agg_thread_arg ta;
+    pthread_t tid;
+    int threaded = 0;
+    char buf[OUT_BUF_SZ];
+    size_t i;
+
+    if (!ctx)
+        return -1;
+
+    /* parallel: v4 in thread, v6 in main */
+    if (ctx->pa.v4_count > 0 && ctx->pa.v6_count > 0) {
+        ta.arr = ctx->pa.v4;
+        ta.count = ctx->pa.v4_count;
+        if (pthread_create(&tid, NULL,
+                           agg_v4_thread, &ta) == 0)
+            threaded = 1;
+    }
+
+    if (!threaded && ctx->pa.v4_count > 0)
+        prefix4_aggregate(ctx->pa.v4, &ctx->pa.v4_count);
+
+    if (ctx->pa.v6_count > 0)
+        prefix6_aggregate(ctx->pa.v6, &ctx->pa.v6_count);
+
+    if (threaded) {
+        pthread_join(tid, NULL);
+        ctx->pa.v4_count = ta.count;
+    }
+
+    for (i = 0; i < ctx->pa.v4_count; i++) {
+        prefix4_format(&ctx->pa.v4[i], buf, sizeof(buf));
+        fputs(buf, stdout);
+    }
+    for (i = 0; i < ctx->pa.v6_count; i++) {
+        prefix6_format(&ctx->pa.v6[i], buf, sizeof(buf));
+        fputs(buf, stdout);
+    }
+
+    pa_free(&ctx->pa);
+    free(ctx);
     return 0;
 }

@@ -1,9 +1,10 @@
 CC      ?= gcc
 CFLAGS  ?= -Wall -Wextra -Werror -O2 -std=c99
 LDFLAGS ?=
+LDLIBS  ?= -lpthread
 
 TARGET  = aggregate6
-SRC     = src/main.c src/aggregate.c src/trie.c
+SRC     = src/main.c src/aggregate.c src/prefix.c
 OBJ     = $(SRC:.c=.o)
 DEP     = $(SRC:.c=.d)
 
@@ -14,7 +15,7 @@ PREFIX  ?= /usr/local
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
-	$(CC) $(LDFLAGS) -o $@ $(OBJ)
+	$(CC) $(LDFLAGS) -o $@ $(OBJ) $(LDLIBS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -MMD -MP -c -o $@ $<

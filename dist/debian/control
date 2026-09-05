@@ -11,7 +11,8 @@ Vcs-Browser: https://github.com/0xkee/aggregate6/tree/master/dist/debian
 Package: aggregate6
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: Fast CIDR prefix aggregation tool
- Reads IPv4/IPv6 prefixes from stdin, aggregates them,
+Description: Fast multi-threaded IPv4/IPv6 CIDR prefix aggregation tool
+ Reads bulk IPv4/IPv6 prefix lists from stdin or files,
+ aggregates them using a multi-threaded Patricia trie,
  outputs minimal covering set. Written in C99 with zero
  external dependencies.

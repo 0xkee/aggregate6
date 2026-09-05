@@ -3,10 +3,10 @@ DISTVERSION=	0.2.1
 CATEGORIES=	net
 
 MAINTAINER=	0xkee@users.noreply.github.com
-COMMENT=	Fast CIDR prefix aggregation tool
+COMMENT=	Fast multi-threaded IPv4/IPv6 CIDR prefix aggregation tool
 WWW=		https://github.com/0xkee/aggregate6
 
-LICENSE=	GPLv3+
+LICENSE=	GPLv3
 LICENSE_FILE=	${WRKSRC}/LICENSE
 
 MASTER_SITES=	https://github.com/0xkee/aggregate6/releases/download/v${DISTVERSION}/

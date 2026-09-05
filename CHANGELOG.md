@@ -5,7 +5,46 @@ All notable changes to aggregate6 will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.3.0] - 2026-09-06
+
+### Added
+
+- Debian/Ubuntu: pre-built `.deb` packages published to GitHub Releases via `deb-release.yml` workflow
+- Description updated across all packaging: "Fast multi-threaded IPv4/IPv6 CIDR prefix aggregation tool"
+
+### Changed
+
+- License changed from `GPL-3.0-or-later` to `GPL-3.0-only` across all files (SPDX headers, packaging, README)
+- Copyright year updated to 2026 in all source headers, debian/copyright, Gentoo ebuilds
+
+### Removed
+
+- Dead code: `src/trie.c` and `src/trie.h` (replaced by sorted array algorithm in `src/aggregate.c`)
+
+### Fixed
+
+- Outdated `VERSION=0.1.0` in dist/rpm, dist/debian, dist/freebsd README examples → `0.2.1`
+- Inconsistent description in dist/freebsd, dist/entware, dist/openwrt README headers
+
+- Entware: pre-built `.ipk` packages for mipsel, aarch64, armv7, x86_64 (static, no runtime deps) via `entware-release.yml` workflow
+- File argument support: `aggregate6 file1 file2 ...` (reads files directly, no pipe needed)
+- `-` as file argument reads from stdin (like standard Unix tools)
+- `agg_add_file()` — mmap-based file reading for zero-copy parsing (auto-fallback to fgets)
+
+### Changed
+
+- **Performance**: sorted array algorithm replacing binary trie — radix sort + linear dedup + iterative sibling merge (cache-friendly, O(n))
+- **Performance**: 5-pass LSD radix sort for IPv4 prefixes replacing `qsort` — O(n) vs O(n log n)
+- **Performance**: `mmap(MAP_PRIVATE)` for file inputs — zero-copy parsing, in-place NUL-termination
+- **Performance**: hand-written IPv4 CIDR parser replacing `inet_pton` + `strchr` + `atoi` (~3× faster)
+- **Performance**: hand-written IPv4 address formatter replacing `inet_ntop` + `printf`
+- **Performance**: parallel IPv4/IPv6 aggregation via pthreads (v4 in worker thread, v6 in main)
+- **Performance**: pre-allocated arrays based on file size estimate (avoids realloc during parsing)
+- **Performance**: 64KB I/O buffers for both stdin and stdout (`setvbuf`)
+- **Performance**: stream processing — parse prefixes directly, no intermediate `strdup` array
+- Core data structures: `struct prefix4` (8 bytes) and `struct prefix6` (24 bytes)
+- API: `agg_create()` / `agg_add_stream()` / `agg_add_file()` / `agg_finish()`
+- New dependency: `-lpthread` (POSIX threads)
 
 ## [0.2.1] - 2026-09-03
 

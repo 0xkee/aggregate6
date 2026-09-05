@@ -1,6 +1,6 @@
 #!/bin/sh
-# SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright (c) 2025 0xkee
+# SPDX-License-Identifier: GPL-3.0-only
+# Copyright (c) 2026 0xkee
 #
 # Comprehensive test suite for aggregate6
 # Tests based on: RFC 791, 950, 1519, 3021, 4193, 4271, 4291, 4632,

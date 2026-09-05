@@ -1,5 +1,5 @@
-Reads IPv4/IPv6 prefixes from stdin, aggregates them using a Patricia trie,
-and outputs the minimal covering set.
+Reads bulk IPv4/IPv6 prefix lists from stdin or files, aggregates them
+using a multi-threaded Patricia trie, and outputs the minimal covering set.
 
 Written in C99 with zero external dependencies. Supports both IPv4 and IPv6.
 Useful for firewall rule optimization and BGP prefix list management.

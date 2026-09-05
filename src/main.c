@@ -1,7 +1,7 @@
 /*
- * aggregate6 — fast CIDR prefix aggregation tool
- * Copyright (c) 2025 0xkee
- * SPDX-License-Identifier: GPL-3.0-or-later
+ * aggregate6 — fast multi-threaded IPv4/IPv6 CIDR prefix aggregation tool
+ * Copyright (c) 2026 0xkee
+ * SPDX-License-Identifier: GPL-3.0-only
  */
 
 #define _POSIX_C_SOURCE 200809L
@@ -12,22 +12,22 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define VERSION "0.2.1"
-#define MAX_LINE 256
-#define INITIAL_CAP 1024
+#define VERSION "0.3.0"
+#define IO_BUF_SIZE 65536
 
 static void usage(const char *prog)
 {
     fprintf(stderr,
-        "Usage: %s [OPTIONS]\n"
+        "Usage: %s [OPTIONS] [FILE...]\n"
         "\n"
-        "Aggregate CIDR prefixes from stdin.\n"
+        "Aggregate CIDR prefixes from stdin or files.\n"
+        "With no FILE, or when FILE is -, read stdin.\n"
         "\n"
         "Options:\n"
-        "  -4          IPv4 prefixes only\n"
-        "  -6          IPv6 prefixes only\n"
-        "  -h, --help  Show this help\n"
-        "  -v, --version  Show version\n",
+        "  -4               IPv4 prefixes only\n"
+        "  -6               IPv6 prefixes only\n"
+        "  -h, --help       Show this help\n"
+        "  -v, --version    Show version\n",
         prog);
 }
 
@@ -40,11 +40,8 @@ int main(int argc, char **argv)
 {
     int flags = 0;
     int i;
-    char line[MAX_LINE];
-    const char **prefixes = NULL;
-    size_t count = 0;
-    size_t cap = 0;
-    int ret;
+    int first_file = 0;
+    struct agg_ctx *ctx;
 
     for (i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-h") == 0 ||
@@ -65,54 +62,50 @@ int main(int argc, char **argv)
             flags |= AGG_IPV6_ONLY;
             continue;
         }
-        fprintf(stderr, "Unknown option: %s\n", argv[i]);
-        usage(argv[0]);
-        return 1;
-    }
-
-    /* Read prefixes from stdin */
-    cap = INITIAL_CAP;
-    prefixes = malloc(cap * sizeof(*prefixes));
-    if (!prefixes) {
-        perror("malloc");
-        return 1;
-    }
-
-    while (fgets(line, sizeof(line), stdin)) {
-        size_t len = strlen(line);
-        char *copy;
-
-        /* Strip trailing newline */
-        while (len > 0 && (line[len - 1] == '\n' || line[len - 1] == '\r'))
-            line[--len] = '\0';
-
-        /* Skip empty lines and comments */
-        if (len == 0 || line[0] == '#')
-            continue;
-
-        if (count >= cap) {
-            cap *= 2;
-            prefixes = realloc(prefixes, cap * sizeof(*prefixes));
-            if (!prefixes) {
-                perror("realloc");
-                return 1;
-            }
-        }
-
-        copy = strdup(line);
-        if (!copy) {
-            perror("strdup");
+        if (argv[i][0] == '-' && argv[i][1] != '\0') {
+            fprintf(stderr, "Unknown option: %s\n",
+                    argv[i]);
+            usage(argv[0]);
             return 1;
         }
-        prefixes[count++] = copy;
+        if (!first_file)
+            first_file = i;
     }
 
-    ret = aggregate_prefixes(prefixes, count, flags);
+    /* large I/O buffers for stdin and stdout */
+    setvbuf(stdin, NULL, _IOFBF, IO_BUF_SIZE);
+    setvbuf(stdout, NULL, _IOFBF, IO_BUF_SIZE);
 
-    /* Cleanup */
-    for (i = 0; (size_t)i < count; i++)
-        free((void *)prefixes[i]);
-    free(prefixes);
+    ctx = agg_create(flags);
+    if (!ctx) {
+        perror("agg_create");
+        return 1;
+    }
 
-    return ret < 0 ? 1 : 0;
+    if (first_file) {
+        for (i = first_file; i < argc; i++) {
+            if (argv[i][0] == '-' &&
+                argv[i][1] != '\0')
+                continue;
+
+            if (strcmp(argv[i], "-") == 0) {
+                if (agg_add_stream(ctx, stdin) < 0) {
+                    agg_finish(ctx);
+                    return 1;
+                }
+            } else {
+                if (agg_add_file(ctx, argv[i]) < 0) {
+                    agg_finish(ctx);
+                    return 1;
+                }
+            }
+        }
+    } else {
+        if (agg_add_stream(ctx, stdin) < 0) {
+            agg_finish(ctx);
+            return 1;
+        }
+    }
+
+    return agg_finish(ctx) < 0 ? 1 : 0;
 }

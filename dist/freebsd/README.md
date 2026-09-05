@@ -1,6 +1,6 @@
 # aggregate6 — FreeBSD Port
 
-FreeBSD port for [aggregate6](https://github.com/0xkee/aggregate6) — fast CIDR prefix aggregation tool.
+FreeBSD port for [aggregate6](https://github.com/0xkee/aggregate6) — fast multi-threaded IPv4/IPv6 CIDR prefix aggregation tool.
 
 ## Port Structure
 
@@ -39,7 +39,7 @@ poudriere bulk -j 14amd64 -p default net/aggregate6
 
 ```bash
 # The port fetches the source tarball from GitHub Releases:
-# https://github.com/0xkee/aggregate6/releases/download/v0.1.0/aggregate6-0.1.0.tar.gz
+# https://github.com/0xkee/aggregate6/releases/download/v0.3.0/aggregate6-0.3.0.tar.gz
 ```
 
 ## Port Details
@@ -48,7 +48,7 @@ poudriere bulk -j 14amd64 -p default net/aggregate6
 - **Install path:** `${PREFIX}/bin/aggregate6`
 - **Dependencies:** none (C99, zero external deps)
 - **Build system:** gmake
-- **License:** GPL-3.0-or-later
+- **License:** GPL-3.0-only
 
 ## Version Updates
 

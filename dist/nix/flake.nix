@@ -1,5 +1,5 @@
 {
-  description = "aggregate6 - Fast CIDR prefix aggregation tool";
+  description = "aggregate6 - Fast multi-threaded IPv4/IPv6 CIDR prefix aggregation tool";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";

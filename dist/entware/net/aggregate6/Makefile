@@ -6,9 +6,9 @@ PKG_RELEASE:=1
 
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://github.com/0xkee/aggregate6/releases/download/v$(PKG_VERSION)
-PKG_HASH:=33dcc3027e4a6525ae57c4ec2180794b002b81a71ef03515776ccf6daaa1b4f3
+PKG_HASH:=7edd5c0de262c21f55a710cea17b6a2fe0a43c355813a1d20bb97aef543671af
 
-PKG_LICENSE:=GPL-3.0-or-later
+PKG_LICENSE:=GPL-3.0-only
 PKG_LICENSE_FILES:=LICENSE
 
 include $(INCLUDE_DIR)/package.mk
@@ -16,13 +16,14 @@ include $(INCLUDE_DIR)/package.mk
 define Package/aggregate6
   SECTION:=net
   CATEGORY:=Network
-  TITLE:=Fast CIDR prefix aggregation tool
+  TITLE:=Fast multi-threaded IPv4/IPv6 CIDR prefix aggregation tool
   URL:=https://github.com/0xkee/aggregate6
   DEPENDS:=+libc
 endef
 
 define Package/aggregate6/description
-  Reads IPv4/IPv6 prefixes from stdin, aggregates them,
+  Reads bulk IPv4/IPv6 prefix lists from stdin or files,
+  aggregates them using a multi-threaded Patricia trie,
   outputs minimal covering set. Written in C99 with zero
   external dependencies.
 endef

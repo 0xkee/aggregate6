@@ -1,0 +1,57 @@
+name: Debian Package
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  deb:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential debhelper devscripts
+
+      - name: Build .deb
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          VERSION="${VERSION#v}"
+
+          mkdir -p /tmp/deb-build && cd /tmp/deb-build
+
+          # Download upstream tarball from the just-published release
+          gh release download "${{ github.event.release.tag_name }}" \
+            --repo "${{ github.repository }}" \
+            --pattern "aggregate6-${VERSION}.tar.gz"
+
+          # Rename to Debian orig tarball format
+          mv "aggregate6-${VERSION}.tar.gz" "aggregate6_${VERSION}.orig.tar.gz"
+
+          # Extract and overlay debian/ packaging from repo
+          tar xzf "aggregate6_${VERSION}.orig.tar.gz"
+          cp -r "${GITHUB_WORKSPACE}/dist/debian" "aggregate6-${VERSION}/debian"
+
+          # Build binary-only package, unsigned
+          cd "aggregate6-${VERSION}"
+          dpkg-buildpackage -us -uc -b
+
+          # Collect .deb for upload
+          mv /tmp/deb-build/aggregate6_*.deb "${GITHUB_WORKSPACE}/"
+
+      - name: Upload .deb to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "${{ github.event.release.tag_name }}" \
+            aggregate6_*.deb \
+            --clobber

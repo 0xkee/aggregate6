@@ -6,8 +6,9 @@
 		<name>0xkee</name>
 	</maintainer>
 	<longdescription>
-		Reads IPv4/IPv6 prefixes from stdin, aggregates them using a Patricia trie,
-		and outputs the minimal covering set. Written in C99 with zero external dependencies.
+		Reads bulk IPv4/IPv6 prefix lists from stdin or files, aggregates them
+		using a multi-threaded Patricia trie, and outputs the minimal covering
+		set. Written in C99 with zero external dependencies.
 	</longdescription>
 	<upstream>
 		<remote-id type="github">0xkee/aggregate6</remote-id>

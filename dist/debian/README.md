@@ -3,11 +3,22 @@
 Debian packaging files for building `.deb` packages from upstream source tarball.
 Uses `3.0 (quilt)` source format with upstream tarball from GitHub Releases.
 
+## Quick install (pre-built .deb)
+
+Pre-built `.deb` packages for amd64 are published automatically to every
+[GitHub Release](https://github.com/0xkee/aggregate6/releases):
+
+```bash
+VERSION=0.3.0
+wget https://github.com/0xkee/aggregate6/releases/download/v${VERSION}/aggregate6_${VERSION}-1_amd64.deb
+sudo dpkg -i aggregate6_${VERSION}-1_amd64.deb
+```
+
 ## Building .deb from source
 
 ```bash
 # Download upstream tarball
-VERSION=0.1.0
+VERSION=0.3.0
 wget https://github.com/0xkee/aggregate6/releases/download/v${VERSION}/aggregate6-${VERSION}.tar.gz
 
 # Rename to Debian orig format

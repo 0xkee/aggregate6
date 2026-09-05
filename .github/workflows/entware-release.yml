@@ -3,6 +3,11 @@ name: Entware Package
 on:
   release:
     types: [published]
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -48,16 +53,16 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          VERSION="${{ github.event.release.tag_name }}"
+          VERSION="${{ inputs.tag || github.event.release.tag_name }}"
           VERSION="${VERSION#v}"
-          gh release download "${{ github.event.release.tag_name }}" \
+          gh release download "${{ inputs.tag || github.event.release.tag_name }}" \
             --repo "${{ github.repository }}" \
             --pattern "aggregate6-${VERSION}.tar.gz"
           tar xzf "aggregate6-${VERSION}.tar.gz"
 
       - name: Cross-compile (static)
         run: |
-          VERSION="${{ github.event.release.tag_name }}"
+          VERSION="${{ inputs.tag || github.event.release.tag_name }}"
           VERSION="${VERSION#v}"
           cd "aggregate6-${VERSION}"
           make CC="${{ matrix.cc }}" \
@@ -69,7 +74,7 @@ jobs:
 
       - name: Create .ipk
         run: |
-          VERSION="${{ github.event.release.tag_name }}"
+          VERSION="${{ inputs.tag || github.event.release.tag_name }}"
           VERSION="${VERSION#v}"
           SRCDIR="aggregate6-${VERSION}"
           WORK=$(mktemp -d)
@@ -114,6 +119,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release upload "${{ github.event.release.tag_name }}" \
+          gh release upload "${{ inputs.tag || github.event.release.tag_name }}" \
             aggregate6_*.ipk \
             --clobber

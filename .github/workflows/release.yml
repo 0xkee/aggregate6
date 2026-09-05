@@ -10,6 +10,8 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ github.ref_name }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -76,3 +78,19 @@ jobs:
             aggregate6-${{ steps.version.outputs.version }}.tar.gz
             aggregate6-${{ steps.version.outputs.version }}.tar.gz.sha256
             aggregate6-${{ steps.version.outputs.version }}.tar.gz.sha512
+
+  deb:
+    needs: release
+    uses: ./.github/workflows/deb-release.yml
+    with:
+      tag: ${{ needs.release.outputs.tag }}
+    permissions:
+      contents: write
+
+  entware:
+    needs: release
+    uses: ./.github/workflows/entware-release.yml
+    with:
+      tag: ${{ needs.release.outputs.tag }}
+    permissions:
+      contents: write

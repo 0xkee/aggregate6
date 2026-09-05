@@ -86,7 +86,6 @@ uscan --no-download --verbose
 | File | Description |
 |------|-------------|
 | `changelog` | Debian changelog (auto-updated by release workflow) |
-| `compat` | Debhelper compatibility level (13) |
 | `control` | Package metadata and dependencies |
 | `copyright` | DEP-5 copyright information |
 | `rules` | Build rules (dh-based) |

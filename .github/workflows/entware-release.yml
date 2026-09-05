@@ -16,17 +16,17 @@ jobs:
           - arch: mipsel
             cc: mipsel-linux-gnu-gcc
             strip: mipsel-linux-gnu-strip
-            pkg: gcc-mipsel-linux-gnu
+            pkg: gcc-mipsel-linux-gnu libc6-dev-mipsel-cross
             entware_arch: mipsel-3x
           - arch: aarch64
             cc: aarch64-linux-gnu-gcc
             strip: aarch64-linux-gnu-strip
-            pkg: gcc-aarch64-linux-gnu
+            pkg: gcc-aarch64-linux-gnu libc6-dev-arm64-cross
             entware_arch: aarch64-3x
           - arch: armv7
             cc: arm-linux-gnueabihf-gcc
             strip: arm-linux-gnueabihf-strip
-            pkg: gcc-arm-linux-gnueabihf
+            pkg: gcc-arm-linux-gnueabihf libc6-dev-armhf-cross
             entware_arch: armv7-3x
           - arch: x86_64
             cc: gcc

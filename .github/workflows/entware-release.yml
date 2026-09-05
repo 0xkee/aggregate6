@@ -106,11 +106,12 @@ jobs:
           # debian-binary
           echo "2.0" > "${WORK}/debian-binary"
 
-          # Assemble .ipk (ar archive, order matters)
+          # Assemble .ipk (tar.gz format for Entware/OpenWrt opkg compatibility)
           IPK="aggregate6_${VERSION}-1_${{ matrix.entware_arch }}.ipk"
           cd "${WORK}"
-          ar r "${GITHUB_WORKSPACE}/${IPK}" \
-            debian-binary control.tar.gz data.tar.gz
+          tar czf "${GITHUB_WORKSPACE}/${IPK}" \
+            --numeric-owner --owner=0 --group=0 \
+            ./debian-binary ./control.tar.gz ./data.tar.gz
 
           echo "Created: ${IPK}"
           ls -lh "${GITHUB_WORKSPACE}/${IPK}"

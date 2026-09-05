@@ -1,5 +1,5 @@
 Name:           aggregate6
-Version:        0.2.1
+Version:        0.3.0
 Release:        1%{?dist}
 Summary:        Fast multi-threaded IPv4/IPv6 CIDR prefix aggregation tool
 
@@ -33,6 +33,8 @@ make test
 %{_bindir}/aggregate6
 
 %changelog
+* Sat Sep 05 2026 0xkee <0xkee@users.noreply.github.com> - 0.3.0-1
+- Update to 0.3.0
 * Thu Sep 03 2026 0xkee <0xkee@users.noreply.github.com> - 0.2.1-1
 - Update to 0.2.1
 * Wed Sep 02 2026 0xkee <0xkee@users.noreply.github.com> - 0.2.0-1

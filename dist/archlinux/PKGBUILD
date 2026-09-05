@@ -1,6 +1,6 @@
 # Maintainer: 0xkee <0xkee@users.noreply.github.com>
 pkgname=aggregate6
-pkgver=0.2.1
+pkgver=0.3.0
 pkgrel=1
 pkgdesc='Fast multi-threaded IPv4/IPv6 CIDR prefix aggregation tool'
 arch=('x86_64' 'aarch64')
@@ -8,7 +8,7 @@ url='https://github.com/0xkee/aggregate6'
 license=('GPL-3.0-only')
 depends=('glibc')
 source=("$pkgname-$pkgver.tar.gz::https://github.com/0xkee/aggregate6/releases/download/v$pkgver/aggregate6-$pkgver.tar.gz")
-sha256sums=('7edd5c0de262c21f55a710cea17b6a2fe0a43c355813a1d20bb97aef543671af')
+sha256sums=('44545e513bb28351284c93738debf35e061d75d984f43d95edd78d85cd2dba24')
 
 build() {
 	cd "$pkgname-$pkgver"

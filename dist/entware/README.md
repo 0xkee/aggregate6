@@ -21,7 +21,7 @@ Pre-built `.ipk` packages (statically linked) are published to every
 
 ```bash
 VERSION=0.3.0
-ARCH=mipsel-3x   # see table below
+ARCH=mipsel-3.4   # see table below
 
 wget https://github.com/0xkee/aggregate6/releases/download/v${VERSION}/aggregate6_${VERSION}-1_${ARCH}.ipk
 opkg install aggregate6_${VERSION}-1_${ARCH}.ipk
@@ -29,10 +29,10 @@ opkg install aggregate6_${VERSION}-1_${ARCH}.ipk
 
 | Entware arch | CPU | Devices |
 |---|---|---|
-| `mipsel-3x` | MIPS32 R2 LE | Keenetic (MT7621), many routers |
-| `aarch64-3x` | ARM64 | Keenetic new (MT7981/7986), NAS |
-| `armv7-3x` | ARMv7 HF | ASUS Merlin, Synology ARM NAS |
-| `x86-64-3x` | x86-64 | Synology, QNAP x86 NAS |
+| `mipsel-3.4` | MIPS32 R2 LE | Keenetic (MT7621), many routers |
+| `aarch64-3.10` | ARM64 | Keenetic new (MT7981/7986), NAS |
+| `armv7-3.2` | ARMv7 HF | ASUS Merlin, Synology ARM NAS |
+| `x64-3.2` | x86-64 | Synology, QNAP x86 NAS |
 
 ## Building from source
 

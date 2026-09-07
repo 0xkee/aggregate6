@@ -22,22 +22,22 @@ jobs:
             cc: mipsel-linux-gnu-gcc
             strip: mipsel-linux-gnu-strip
             pkg: gcc-mipsel-linux-gnu libc6-dev-mipsel-cross
-            entware_arch: mipsel-3x
+            entware_arch: mipsel-3.4
           - arch: aarch64
             cc: aarch64-linux-gnu-gcc
             strip: aarch64-linux-gnu-strip
             pkg: gcc-aarch64-linux-gnu libc6-dev-arm64-cross
-            entware_arch: aarch64-3x
+            entware_arch: aarch64-3.10
           - arch: armv7
             cc: arm-linux-gnueabihf-gcc
             strip: arm-linux-gnueabihf-strip
             pkg: gcc-arm-linux-gnueabihf libc6-dev-armhf-cross
-            entware_arch: armv7-3x
+            entware_arch: armv7-3.2
           - arch: x86_64
             cc: gcc
             strip: strip
             pkg: ""
-            entware_arch: x86-64-3x
+            entware_arch: x64-3.2
 
     steps:
       - name: Checkout

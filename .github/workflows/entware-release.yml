@@ -43,18 +43,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install musl.cc cross-compiler
+      - name: Cache musl.cc toolchain
+        id: tc-cache
+        uses: actions/cache@v4
+        with:
+          path: /opt/${{ matrix.toolchain }}
+          key: musl-cc-${{ matrix.toolchain }}
+
+      - name: Download musl.cc cross-compiler
+        if: steps.tc-cache.outputs.cache-hit != 'true'
         run: |
-          url="https://musl.cc/${{ matrix.toolchain }}.tgz"
-          for i in 1 2 3; do
-            echo "Downloading ${{ matrix.toolchain }} (attempt $i)..."
-            curl -sfL --retry 3 --retry-delay 5 -o /tmp/toolchain.tgz "$url" && break
-            echo "Download failed, retrying in 10s..."
-            sleep 10
-          done
+          curl -sfL -m 120 --retry 3 --retry-delay 5 \
+            -o /tmp/toolchain.tgz \
+            "https://musl.cc/${{ matrix.toolchain }}.tgz"
           tar xzf /tmp/toolchain.tgz -C /opt
           rm -f /tmp/toolchain.tgz
-          echo "/opt/${{ matrix.toolchain }}/bin" >> $GITHUB_PATH
+
+      - name: Add toolchain to PATH
+        run: echo "/opt/${{ matrix.toolchain }}/bin" >> $GITHUB_PATH
 
       - name: Download source tarball
         env:

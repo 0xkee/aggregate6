@@ -23,7 +23,7 @@ jobs:
           ref: master
           path: _main
           sparse-checkout: |
-            scripts/generate-packages-index.sh
+            dist/entware/scripts/generate-packages-index.sh
           sparse-checkout-cone-mode: false
 
       - name: Promote packages
@@ -35,7 +35,7 @@ jobs:
           echo "Promoted all packages from dev to stable"
 
       - name: Regenerate stable index
-        run: sh ./_main/scripts/generate-packages-index.sh stable
+        run: sh ./_main/dist/entware/scripts/generate-packages-index.sh stable
 
       - name: Commit and push
         run: |

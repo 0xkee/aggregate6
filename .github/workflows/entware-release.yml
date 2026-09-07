@@ -154,7 +154,7 @@ jobs:
           cp ipks/*.ipk /tmp/gh-pages/dev/
 
           # Regenerate index
-          sh scripts/generate-packages-index.sh /tmp/gh-pages/dev
+          sh dist/entware/scripts/generate-packages-index.sh /tmp/gh-pages/dev
 
           # Commit
           cd /tmp/gh-pages

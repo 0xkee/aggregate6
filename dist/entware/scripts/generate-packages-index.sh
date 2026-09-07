@@ -1,4 +1,4 @@
-#!/opt/bin/sh
+#!/bin/sh
 # Generate opkg Packages index from .ipk files in a directory.
 # Usage: ./scripts/generate-packages-index.sh [dir]
 #

@@ -5,6 +5,12 @@ All notable changes to aggregate6 will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2026-09-07
+
+### Fixed
+
+- Entware `.ipk` builds: switched from Ubuntu glibc cross-compilers (hard-float) to musl.cc toolchains (soft-float) for correct ABI compatibility with Entware/Keenetic devices. Binary size reduced ~7.5× (musl static vs glibc static). Affected architectures: mipsel (`mipsel-linux-muslsf`), armv7 (`arm-linux-musleabi`), aarch64 (`aarch64-linux-musl`), x86_64 (`x86_64-linux-musl`)
+
 ## [0.3.0] - 2026-09-06
 
 ### Added

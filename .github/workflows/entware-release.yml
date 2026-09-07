@@ -19,35 +19,34 @@ jobs:
       matrix:
         include:
           - arch: mipsel
-            cc: mipsel-linux-gnu-gcc
-            strip: mipsel-linux-gnu-strip
-            pkg: gcc-mipsel-linux-gnu libc6-dev-mipsel-cross
+            toolchain: mipsel-linux-muslsf-cross
+            cc_prefix: mipsel-linux-muslsf
             entware_arch: mipsel-3.4
+            extra_cflags: "-march=mips32r2 -mtune=mips32r2"
           - arch: aarch64
-            cc: aarch64-linux-gnu-gcc
-            strip: aarch64-linux-gnu-strip
-            pkg: gcc-aarch64-linux-gnu libc6-dev-arm64-cross
+            toolchain: aarch64-linux-musl-cross
+            cc_prefix: aarch64-linux-musl
             entware_arch: aarch64-3.10
+            extra_cflags: ""
           - arch: armv7
-            cc: arm-linux-gnueabihf-gcc
-            strip: arm-linux-gnueabihf-strip
-            pkg: gcc-arm-linux-gnueabihf libc6-dev-armhf-cross
+            toolchain: arm-linux-musleabi-cross
+            cc_prefix: arm-linux-musleabi
             entware_arch: armv7-3.2
+            extra_cflags: "-march=armv7-a -mtune=cortex-a9"
           - arch: x86_64
-            cc: gcc
-            strip: strip
-            pkg: ""
+            toolchain: x86_64-linux-musl-cross
+            cc_prefix: x86_64-linux-musl
             entware_arch: x64-3.2
+            extra_cflags: ""
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install cross-compiler
-        if: matrix.pkg != ''
+      - name: Install musl.cc cross-compiler
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends ${{ matrix.pkg }}
+          curl -sL "https://musl.cc/${{ matrix.toolchain }}.tgz" | tar xz -C /opt
+          echo "/opt/${{ matrix.toolchain }}/bin" >> $GITHUB_PATH
 
       - name: Download source tarball
         env:
@@ -65,12 +64,13 @@ jobs:
           VERSION="${{ inputs.tag || github.event.release.tag_name }}"
           VERSION="${VERSION#v}"
           cd "aggregate6-${VERSION}"
-          make CC="${{ matrix.cc }}" \
-            CFLAGS="-Wall -Wextra -Werror -O2 -std=c99" \
+          make CC="${{ matrix.cc_prefix }}-gcc" \
+            CFLAGS="-Wall -Wextra -Werror -O2 -std=c99 ${{ matrix.extra_cflags }}" \
             LDFLAGS="-static" \
-            LDLIBS="-lpthread"
-          ${{ matrix.strip }} aggregate6
+            LDLIBS=""
+          ${{ matrix.cc_prefix }}-strip aggregate6
           file aggregate6
+          readelf -A aggregate6 | grep -iE 'FP ABI|CPR1|float' || true
 
       - name: Create .ipk
         run: |
@@ -123,3 +123,45 @@ jobs:
           gh release upload "${{ inputs.tag || github.event.release.tag_name }}" \
             aggregate6_*.ipk \
             --clobber
+
+  publish:
+    needs: ipk
+    runs-on: ubuntu-latest
+    concurrency:
+      group: gh-pages-deploy
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download .ipk from release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ inputs.tag || github.event.release.tag_name }}"
+          mkdir -p ipks
+          gh release download "$TAG" --pattern '*.ipk' --dir ipks/
+
+      - name: Publish to opkg feed
+        run: |
+          git fetch origin gh-pages
+          git worktree add /tmp/gh-pages gh-pages
+
+          # Remove old versions
+          rm -f /tmp/gh-pages/dev/aggregate6_*.ipk
+
+          # Copy new
+          mkdir -p /tmp/gh-pages/dev
+          cp ipks/*.ipk /tmp/gh-pages/dev/
+
+          # Regenerate index
+          sh scripts/generate-packages-index.sh /tmp/gh-pages/dev
+
+          # Commit
+          cd /tmp/gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          TAG="${{ inputs.tag || github.event.release.tag_name }}"
+          VER="${TAG#v}"
+          git commit -m "dev: aggregate6 v${VER}" || true
+          git push origin gh-pages

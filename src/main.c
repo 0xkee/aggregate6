@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define VERSION "0.3.0"
+#define VERSION "0.3.1"
 #define IO_BUF_SIZE 65536
 
 static void usage(const char *prog)

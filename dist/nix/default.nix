@@ -6,7 +6,7 @@ stdenv.mkDerivation rec {
 
   src = fetchurl {
     url = "https://github.com/0xkee/aggregate6/releases/download/v${version}/${pname}-${version}.tar.gz";
-    sha256 = "sha256-Nlhk8OvfWRa7HB9pIeon2RInxAwGioSWKdbW12+2FqQ=";
+    sha256 = "sha256-PW6fwCnDsmPgrojyzThFNYn36fUjZgkf9N1uOtCVWJU=";
   };
 
   # Zero external dependencies — only libc

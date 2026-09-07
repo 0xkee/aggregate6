@@ -8,7 +8,7 @@ url='https://github.com/0xkee/aggregate6'
 license=('GPL-3.0-only')
 depends=('glibc')
 source=("$pkgname-$pkgver.tar.gz::https://github.com/0xkee/aggregate6/releases/download/v$pkgver/aggregate6-$pkgver.tar.gz")
-sha256sums=('621b3c98b65653e56a688dbdb0381e6d92fdb2dc5e85bc62266330db6f29d0c0')
+sha256sums=('3a6e22c41d746a047e092eec01d9a3616af5b9f13ba15b1996f22823bafa62a4')
 
 build() {
 	cd "$pkgname-$pkgver"

@@ -1,0 +1,14 @@
+Package: aggregate6
+Version: 0.3.1-1
+Architecture: mipsel-3.4
+Maintainer: 0xkee <0xkee@users.noreply.github.com>
+Section: net
+Priority: optional
+Description: Fast multi-threaded IPv4/IPv6 CIDR prefix aggregation tool
+Source: https://github.com/0xkee/aggregate6
+License: GPL-3.0-only
+Filename: aggregate6_0.3.1-1_mipsel-3.4.ipk
+Size: 46440
+MD5sum: cf6ce0d584437393d4a8e2e9bfa67246
+SHA256sum: 753ca8570b55f173ddbe517aa6384c0dce5966cc58f2c8ab5953a6de25844ff8
+

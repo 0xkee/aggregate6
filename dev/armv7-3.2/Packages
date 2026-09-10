@@ -1,0 +1,14 @@
+Package: aggregate6
+Version: 0.3.1-1
+Architecture: armv7-3.2
+Maintainer: 0xkee <0xkee@users.noreply.github.com>
+Section: net
+Priority: optional
+Description: Fast multi-threaded IPv4/IPv6 CIDR prefix aggregation tool
+Source: https://github.com/0xkee/aggregate6
+License: GPL-3.0-only
+Filename: aggregate6_0.3.1-1_armv7-3.2.ipk
+Size: 31858
+MD5sum: 949b22b61169fa413b5abf4a001db63e
+SHA256sum: d3d03bc88670c6c05057eb4e5898207bce85ec529f906c6d08549584051cb905
+

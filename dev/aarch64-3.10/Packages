@@ -1,0 +1,14 @@
+Package: aggregate6
+Version: 0.3.1-1
+Architecture: aarch64-3.10
+Maintainer: 0xkee <0xkee@users.noreply.github.com>
+Section: net
+Priority: optional
+Description: Fast multi-threaded IPv4/IPv6 CIDR prefix aggregation tool
+Source: https://github.com/0xkee/aggregate6
+License: GPL-3.0-only
+Filename: aggregate6_0.3.1-1_aarch64-3.10.ipk
+Size: 35771
+MD5sum: 86b557c16cb247faa4a54fcdb59b3f08
+SHA256sum: 279c22285671f9a5b48a3d2f2f5d89ad28fd0614f6817f454e30379e96090bd5
+

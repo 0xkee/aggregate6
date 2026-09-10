@@ -28,10 +28,18 @@ jobs:
 
       - name: Promote packages
         run: |
+          # Clean stable (per-arch subdirectories and legacy flat layout)
+          rm -rf stable/mipsel-3.4 stable/aarch64-3.10 stable/armv7-3.2 stable/x64-3.2
+          rm -f stable/*.ipk stable/Packages stable/Packages.gz
           mkdir -p stable
-          # Clean stable and copy all packages from dev
-          rm -f stable/*.ipk
-          cp dev/*.ipk stable/
+
+          # Copy per-arch subdirectories from dev to stable
+          for archdir in dev/*/; do
+            [ -d "$archdir" ] || continue
+            arch="$(basename "$archdir")"
+            mkdir -p "stable/$arch"
+            cp "$archdir"*.ipk "stable/$arch/" 2>/dev/null || true
+          done
           echo "Promoted all packages from dev to stable"
 
       - name: Regenerate stable index

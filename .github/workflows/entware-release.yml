@@ -163,14 +163,19 @@ jobs:
           git fetch origin gh-pages
           git worktree add /tmp/gh-pages gh-pages
 
-          # Remove old versions
-          rm -f /tmp/gh-pages/dev/aggregate6_*.ipk
+          # Remove old per-arch packages (and legacy flat layout)
+          rm -rf /tmp/gh-pages/dev/mipsel-3.4 \
+                 /tmp/gh-pages/dev/aarch64-3.10 \
+                 /tmp/gh-pages/dev/armv7-3.2 \
+                 /tmp/gh-pages/dev/x64-3.2
+          rm -f /tmp/gh-pages/dev/aggregate6_*.ipk \
+                /tmp/gh-pages/dev/Packages /tmp/gh-pages/dev/Packages.gz
 
-          # Copy new
+          # Copy .ipk files (flat) — script will organize by arch
           mkdir -p /tmp/gh-pages/dev
           cp ipks/*.ipk /tmp/gh-pages/dev/
 
-          # Regenerate index
+          # Organize into per-arch subdirectories and generate indices
           sh dist/entware/scripts/generate-packages-index.sh /tmp/gh-pages/dev
 
           # Commit

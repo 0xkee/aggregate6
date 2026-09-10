@@ -16,16 +16,36 @@ automatically scans `net/*/Makefile` to discover packages.
 
 ## Quick install (pre-built .ipk)
 
+### Option A: opkg feed (recommended)
+
+Add the per-architecture opkg feed to your router — replace `ARCH` with your
+Entware architecture (see table below):
+
+```bash
+ARCH=mipsel-3.4   # see table below
+CHANNEL=stable    # or "dev"
+
+echo "src/gz aggr6 https://0xkee.github.io/aggregate6/${CHANNEL}/${ARCH}" >> /opt/etc/opkg.conf
+opkg update
+opkg install aggregate6
+```
+
+> **Tip:** find your Entware architecture with `opkg print-architecture | awk '$3==150{print $2}'`
+
+### Option B: direct .ipk download
+
 Pre-built `.ipk` packages (statically linked) are published to every
 [GitHub Release](https://github.com/0xkee/aggregate6/releases):
 
 ```bash
-VERSION=0.3.0
+VERSION=0.3.1
 ARCH=mipsel-3.4   # see table below
 
 wget https://github.com/0xkee/aggregate6/releases/download/v${VERSION}/aggregate6_${VERSION}-1_${ARCH}.ipk
 opkg install aggregate6_${VERSION}-1_${ARCH}.ipk
 ```
+
+### Supported architectures
 
 | Entware arch | CPU | Devices |
 |---|---|---|
@@ -33,6 +53,9 @@ opkg install aggregate6_${VERSION}-1_${ARCH}.ipk
 | `aarch64-3.10` | ARM64 | Keenetic new (MT7981/7986), NAS |
 | `armv7-3.2` | ARMv7 HF | ASUS Merlin, Synology ARM NAS |
 | `x64-3.2` | x86-64 | Synology, QNAP x86 NAS |
+
+The opkg feed uses per-architecture subdirectories — each router only sees
+packages matching its architecture, avoiding "no valid architecture" warnings.
 
 ## Building from source
 

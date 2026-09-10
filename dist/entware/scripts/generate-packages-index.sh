@@ -1,11 +1,19 @@
 #!/bin/sh
-# Generate opkg Packages index from .ipk files in a directory.
+# Generate per-architecture opkg Packages indices from .ipk files.
 # Usage: ./scripts/generate-packages-index.sh [dir]
 #
-# For each .ipk in <dir>:
-#   - Extracts control metadata from the package
-#   - Appends Filename, Size, MD5sum, SHA256sum fields
-# Produces <dir>/Packages and <dir>/Packages.gz
+# Scans <dir> for .ipk files, extracts architecture from each control,
+# organizes into <dir>/<arch>/ subdirectories, and generates
+# Packages + Packages.gz in each subdirectory.
+#
+# Example result:
+#   dev/
+#     mipsel-3.4/
+#       aggregate6_0.3.1-1_mipsel-3.4.ipk
+#       Packages
+#       Packages.gz
+#     aarch64-3.10/
+#       ...
 set -eu
 
 DIR="${1:-.}"
@@ -15,44 +23,71 @@ if [ ! -d "$DIR" ]; then
     exit 1
 fi
 
-PACKAGES_FILE="$DIR/Packages"
-: > "$PACKAGES_FILE"
+total=0
 
-count=0
-
+# Phase 1: Organize .ipk files into per-arch subdirectories
 for ipk in "$DIR"/*.ipk; do
-    # Skip if glob didn't expand (no .ipk files)
     [ -e "$ipk" ] || continue
 
+    # Extract architecture from control inside .ipk
     tmpdir="$(mktemp -d)"
-
-    # .ipk is tar.gz: ./debian-binary, ./control.tar.gz, ./data.tar.gz
     tar -xzf "$ipk" -C "$tmpdir" ./control.tar.gz
-    # control.tar.gz contains ./control (plus postinst, postrm, etc.)
     tar -xzf "$tmpdir/control.tar.gz" -C "$tmpdir" ./control
-
-    # Append control fields + package metadata
-    # Command substitution strips trailing newlines from control
-    control_content="$(cat "$tmpdir/control")"
-    filename="$(basename "$ipk")"
-    size="$(stat -c%s "$ipk")"
-    md5="$(md5sum "$ipk" | cut -d' ' -f1)"
-    sha256="$(sha256sum "$ipk" | cut -d' ' -f1)"
-
-    {
-        printf "%s\n" "$control_content"
-        printf "Filename: %s\n" "$filename"
-        printf "Size: %s\n" "$size"
-        printf "MD5sum: %s\n" "$md5"
-        printf "SHA256sum: %s\n" "$sha256"
-        printf "\n"
-    } >> "$PACKAGES_FILE"
-
+    arch=$(sed -n 's/^Architecture: *//p' "$tmpdir/control")
     rm -rf "$tmpdir"
-    count=$((count + 1))
+
+    if [ -z "$arch" ]; then
+        echo "WARNING: No Architecture in $ipk, skipping" >&2
+        continue
+    fi
+
+    mkdir -p "$DIR/$arch"
+    cp "$ipk" "$DIR/$arch/"
+    rm -f "$ipk"
 done
 
-# Generate compressed index
-gzip -k -f "$PACKAGES_FILE"
+# Phase 2: Generate Packages index in each arch subdirectory
+for archdir in "$DIR"/*/; do
+    [ -d "$archdir" ] || continue
 
-echo "Generated Packages index: $count package(s) in $DIR"
+    packages_file="${archdir}Packages"
+    : > "$packages_file"
+    count=0
+
+    for ipk in "$archdir"*.ipk; do
+        [ -e "$ipk" ] || continue
+
+        tmpdir="$(mktemp -d)"
+        tar -xzf "$ipk" -C "$tmpdir" ./control.tar.gz
+        tar -xzf "$tmpdir/control.tar.gz" -C "$tmpdir" ./control
+
+        control_content="$(cat "$tmpdir/control")"
+        filename="$(basename "$ipk")"
+        size="$(stat -c%s "$ipk")"
+        md5="$(md5sum "$ipk" | cut -d' ' -f1)"
+        sha256="$(sha256sum "$ipk" | cut -d' ' -f1)"
+
+        {
+            printf "%s\n" "$control_content"
+            printf "Filename: %s\n" "$filename"
+            printf "Size: %s\n" "$size"
+            printf "MD5sum: %s\n" "$md5"
+            printf "SHA256sum: %s\n" "$sha256"
+            printf "\n"
+        } >> "$packages_file"
+
+        rm -rf "$tmpdir"
+        count=$((count + 1))
+    done
+
+    gzip -k -f "$packages_file"
+
+    archname="$(basename "$archdir")"
+    echo "  ${archname}: ${count} package(s)"
+    total=$((total + count))
+done
+
+# Phase 3: Clean up any leftover flat Packages files
+rm -f "$DIR/Packages" "$DIR/Packages.gz"
+
+echo "Generated per-arch indices: ${total} package(s) total in $DIR"
